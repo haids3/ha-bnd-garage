@@ -9,6 +9,7 @@ from homeassistant.core import HomeAssistant
 
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
+from custom_components.bnd_garage.calibration import CalibrationCurve
 from custom_components.bnd_garage.coordinator import (
     MOVING_UPDATE_INTERVAL,
     UPDATE_INTERVAL,
@@ -197,6 +198,107 @@ async def test_moving_position_reanchors_on_direction_reversal(
     ):
         await coordinator.async_refresh()
     assert coordinator.data.position == 30  # 40 - 10%/s * 1s on the new rate
+
+    assert await hass.config_entries.async_unload(mock_config_entry.entry_id)
+    await hass.async_block_till_done()
+
+
+async def test_moving_position_uses_calibrated_curve(
+    hass: HomeAssistant,
+    mock_config_entry: MockConfigEntry,
+    mock_client: AsyncMock,
+) -> None:
+    """Test a calibrated curve is used instead of the flat-rate estimate."""
+    mock_client.async_get_status.return_value = DoorStatus(
+        state=DoorState.CLOSED, position=0, rate=0
+    )
+    with patch(
+        "custom_components.bnd_garage.coordinator.time.monotonic", return_value=400.0
+    ):
+        await setup_integration(hass, mock_config_entry, [])
+    coordinator = mock_config_entry.runtime_data
+    coordinator.open_curve = CalibrationCurve(points=((0, 0), (5, 40), (10, 100)))
+
+    mock_client.async_get_status.return_value = DoorStatus(
+        state=DoorState.MOVING, position=0, rate=10
+    )
+    with patch(
+        "custom_components.bnd_garage.coordinator.time.monotonic", return_value=400.0
+    ):
+        await coordinator.async_refresh()  # segment starts here, at the extreme
+
+    with patch(
+        "custom_components.bnd_garage.coordinator.time.monotonic", return_value=405.0
+    ):
+        await coordinator.async_refresh()
+    # From the curve (5s -> 40), not the flat-rate estimate (0 + 10%/s * 5s = 50).
+    assert coordinator.data.position == 40
+
+    assert await hass.config_entries.async_unload(mock_config_entry.entry_id)
+    await hass.async_block_till_done()
+
+
+async def test_moving_position_ignores_curve_when_not_starting_at_reference(
+    hass: HomeAssistant,
+    mock_config_entry: MockConfigEntry,
+    mock_client: AsyncMock,
+) -> None:
+    """Test a movement starting mid-travel falls back to the flat-rate estimate."""
+    mock_client.async_get_status.return_value = DoorStatus(
+        state=DoorState.PARTIAL, position=30, rate=0
+    )
+    with patch(
+        "custom_components.bnd_garage.coordinator.time.monotonic", return_value=500.0
+    ):
+        await setup_integration(hass, mock_config_entry, [])
+    coordinator = mock_config_entry.runtime_data
+    coordinator.open_curve = CalibrationCurve(points=((0, 0), (5, 40), (10, 100)))
+
+    mock_client.async_get_status.return_value = DoorStatus(
+        state=DoorState.MOVING, position=30, rate=10
+    )
+    with patch(
+        "custom_components.bnd_garage.coordinator.time.monotonic", return_value=500.0
+    ):
+        await coordinator.async_refresh()
+
+    with patch(
+        "custom_components.bnd_garage.coordinator.time.monotonic", return_value=503.0
+    ):
+        await coordinator.async_refresh()
+    assert coordinator.data.position == 60  # 30 + 10%/s * 3s, curve not applicable
+
+    assert await hass.config_entries.async_unload(mock_config_entry.entry_id)
+    await hass.async_block_till_done()
+
+
+async def test_async_calibrate_stores_curves_and_restores_polling(
+    hass: HomeAssistant,
+    mock_config_entry: MockConfigEntry,
+    mock_client: AsyncMock,
+) -> None:
+    """Test calibrate runs the routine, persists curves, and restores polling."""
+    mock_client.async_get_status.return_value = DoorStatus(
+        state=DoorState.CLOSED, position=0, rate=0
+    )
+    await setup_integration(hass, mock_config_entry, [])
+    coordinator = mock_config_entry.runtime_data
+    assert coordinator.update_interval == UPDATE_INTERVAL
+
+    fake_open = CalibrationCurve(points=((0, 0), (10, 100)))
+    fake_close = CalibrationCurve(points=((0, 100), (10, 0)))
+    with patch(
+        "custom_components.bnd_garage.coordinator.async_calibrate",
+        AsyncMock(return_value=(fake_open, fake_close)),
+    ) as mock_calibrate:
+        await coordinator.async_calibrate()
+
+    mock_calibrate.assert_awaited_once_with(coordinator.client)
+    assert coordinator.open_curve == fake_open
+    assert coordinator.close_curve == fake_close
+    assert coordinator.update_interval == UPDATE_INTERVAL
+    assert mock_config_entry.options["open_curve"] == fake_open.to_json()
+    assert mock_config_entry.options["close_curve"] == fake_close.to_json()
 
     assert await hass.config_entries.async_unload(mock_config_entry.entry_id)
     await hass.async_block_till_done()

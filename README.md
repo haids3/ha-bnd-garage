@@ -50,6 +50,15 @@ directory and restart Home Assistant.
 3. Enter the hub's local IP address, the activation code, and the password
    you set in step 1.
 
+## Development
+
+Tests need `bnd-garage-api` installed, which is a private repo (see above).
+CI (`.github/workflows/test.yml`) needs a `BND_GARAGE_API_PAT` repository
+secret — a GitHub personal access token with read access to
+`haids3/bnd-garage-api` — to install it. Add this under
+**Settings → Secrets and variables → Actions** before the test workflow will
+pass.
+
 ## Known limitations
 
 - Only open/close/stop are supported — the hub does not support commanding

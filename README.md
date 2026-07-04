@@ -11,6 +11,22 @@ polling the hub locally over your LAN every 10 seconds.
 - The [B&D Smart Garage Access](https://www.bnd.com.au/) app, used once to
   generate an activation code for pairing.
 
+## Current limitation: private dependency
+
+This integration depends on [bnd-garage-api](https://github.com/haids3/bnd-garage-api),
+which is **not yet public**. It's derived from
+[THE-MAVER1CK/b-and-d-garage-api](https://github.com/THE-MAVER1CK/b-and-d-garage-api)'s
+protocol reverse-engineering, and that upstream project has no LICENSE file —
+so `bnd-garage-api` stays private until that's resolved with its author.
+
+Practically, this means:
+- Installing this integration only works for accounts with access to the
+  private `bnd-garage-api` repo (its git credentials need to be available to
+  wherever Home Assistant installs Python requirements).
+- It is **not usable via HACS by anyone else** until `bnd-garage-api` is
+  published (PyPI or a public repo). Don't submit this to the default HACS
+  store in the meantime.
+
 ## Installation
 
 ### HACS (recommended)

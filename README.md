@@ -59,6 +59,12 @@ secret — a GitHub personal access token with read access to
 **Settings → Secrets and variables → Actions** before the test workflow will
 pass.
 
+The "Hassfest validation" job in `.github/workflows/validate.yml` is expected
+to fail with `[REQUIREMENTS] ... contains a space` for the same reason: core's
+hassfest rejects the `name @ git+https://...` requirement syntax outright,
+with no way to opt out. This resolves itself once `bnd-garage-api` is public
+and `manifest.json` can go back to a normal PyPI version pin.
+
 ## Known limitations
 
 - Only open/close/stop are supported — the hub does not support commanding

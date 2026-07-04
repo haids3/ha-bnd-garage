@@ -1,2 +1,3 @@
+bnd-garage-api @ git+https://github.com/haids3/bnd-garage-api.git@4f0dc73a33788dcb525fad615c1dc4a383129543
 pytest-homeassistant-custom-component==0.13.344
 ruff

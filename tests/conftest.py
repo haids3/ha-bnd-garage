@@ -65,9 +65,7 @@ def mock_register() -> Generator[AsyncMock]:
 @pytest.fixture
 def mock_client() -> Generator[AsyncMock]:
     """Mock the bnd_garage_api Client used during integration setup."""
-    with patch(
-        "custom_components.bnd_garage.Client", autospec=True
-    ) as mock_client_cls:
+    with patch("custom_components.bnd_garage.Client", autospec=True) as mock_client_cls:
         client = mock_client_cls.return_value
         client.async_connect.return_value = None
         client.async_close.return_value = None

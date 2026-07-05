@@ -43,12 +43,13 @@ directory and restart Home Assistant.
 
 ## Setup
 
-1. In the B&D Smart Garage Access app, go to **Settings → Users → your hub → Add new user**
-   and set a password for that user. Note the activation code shown.
+1. In the B&D Smart Garage Access app, go to **Settings → Users → your hub → Add new user**.
+   Note the activation code and password it shows you — the password is
+   assigned automatically, not one you choose.
 2. In Home Assistant, go to **Settings → Devices & Services → Add Integration**
    and search for "B&D Garage".
-3. Enter the hub's local IP address, the activation code, and the password
-   you set in step 1.
+3. Enter the hub's local IP address, and the activation code and password
+   from step 1.
 
 ## Development
 

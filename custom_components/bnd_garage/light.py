@@ -9,7 +9,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
-from .coordinator import BndGarageConfigEntry, BndGarageDataUpdateCoordinator
+from .coordinator import BndGarageConfigEntry
 from .entity import BndGarageEntity
 
 PARALLEL_UPDATES = 1
@@ -31,11 +31,6 @@ class BndGarageLight(BndGarageEntity, LightEntity):
     _attr_translation_key = "hub_light"
     _attr_color_mode = ColorMode.ONOFF
     _attr_supported_color_modes = {ColorMode.ONOFF}
-
-    def __init__(self, coordinator: BndGarageDataUpdateCoordinator) -> None:
-        """Initialize the light."""
-        super().__init__(coordinator)
-        self._attr_unique_id = f"{self._attr_unique_id}_light"
 
     @property
     @override

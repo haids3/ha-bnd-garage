@@ -11,21 +11,14 @@ polling the hub locally over your LAN every 10 seconds.
 - The [B&D Smart Garage Access](https://www.bnd.com.au/) app, used once to
   generate an activation code for pairing.
 
-## Current limitation: private dependency
+## Dependency
 
 This integration depends on [bnd-garage-client](https://github.com/haids3/bnd-garage-client),
 an independent client for the B&D SmartDoorDevices LAN protocol (see that
 repo's README for full attribution to THE-MAVER1CK's original
-protocol-reverse-engineering research). It's currently private pending
-further review before wider distribution.
-
-Practically, this means:
-- Installing this integration only works for accounts with access to the
-  private `bnd-garage-client` repo (its git credentials need to be available
-  to wherever Home Assistant installs Python requirements).
-- It is **not usable via HACS by anyone else** until `bnd-garage-client` is
-  published (PyPI or a public repo). Don't submit this to the default HACS
-  store in the meantime.
+protocol-reverse-engineering research). It's public, but not yet published
+to PyPI, so `manifest.json` pins it via a git commit hash rather than a
+version number — HACS installs fetch it automatically, no extra setup needed.
 
 ## Installation
 
@@ -53,18 +46,14 @@ directory and restart Home Assistant.
 
 ## Development
 
-Tests need `bnd-garage-client` installed, which is a private repo (see
-above). CI (`.github/workflows/test.yml`) needs a `BND_GARAGE_CLIENT_PAT`
-repository secret — a GitHub personal access token with read access to
-`haids3/bnd-garage-client` — to install it. Add this under
-**Settings → Secrets and variables → Actions** before the test workflow will
-pass.
+Tests need `bnd-garage-client` installed — `pip install -r requirements_test.txt`
+pulls it straight from its public repo, no credentials required.
 
 The "Hassfest validation" job in `.github/workflows/validate.yml` is expected
-to fail with `[REQUIREMENTS] ... contains a space` for the same reason: core's
-hassfest rejects the `name @ git+https://...` requirement syntax outright,
-with no way to opt out. This resolves itself once `bnd-garage-client` is
-public and `manifest.json` can go back to a normal PyPI version pin.
+to fail with `[REQUIREMENTS] ... contains a space`: core's hassfest rejects
+the `name @ git+https://...` requirement syntax outright, with no way to opt
+out. This resolves once `bnd-garage-client` is published to PyPI and
+`manifest.json` can use a normal version pin instead.
 
 ## Known limitations
 

@@ -3,8 +3,8 @@
 from collections.abc import Generator
 from unittest.mock import AsyncMock, patch
 
-from bnd_garage_api import Credentials, DoorStatus
-from bnd_garage_api.models import DoorState
+from bnd_garage_client import Credentials, HubStatus
+from bnd_garage_client.models import DoorState
 import pytest
 
 from homeassistant.const import CONF_HOST
@@ -28,9 +28,9 @@ TEST_CREDENTIALS = Credentials(
     hub_id=TEST_HUB_ID,
     phone_id="test-phone-id",
     phone_password="test-phone-password",
-    phone_secret="test-phone-secret",
+    control_secret="test-control-secret",
     user_password="test-user-password",
-    action_device_id="test-action-device-id",
+    device_id="test-device-id",
 )
 
 
@@ -53,9 +53,9 @@ def mock_setup_entry() -> Generator[AsyncMock]:
 
 @pytest.fixture
 def mock_register() -> Generator[AsyncMock]:
-    """Mock the bnd_garage_api pairing call used by the config flow."""
+    """Mock the bnd_garage_client pairing call used by the config flow."""
     with patch(
-        "custom_components.bnd_garage.config_flow.async_register",
+        "custom_components.bnd_garage.config_flow.pair_new_phone",
         autospec=True,
     ) as mock_register:
         mock_register.return_value = TEST_CREDENTIALS
@@ -64,12 +64,14 @@ def mock_register() -> Generator[AsyncMock]:
 
 @pytest.fixture
 def mock_client() -> Generator[AsyncMock]:
-    """Mock the bnd_garage_api Client used during integration setup."""
-    with patch("custom_components.bnd_garage.Client", autospec=True) as mock_client_cls:
+    """Mock the bnd_garage_client HubClient used during integration setup."""
+    with patch(
+        "custom_components.bnd_garage.HubClient", autospec=True
+    ) as mock_client_cls:
         client = mock_client_cls.return_value
-        client.async_connect.return_value = None
-        client.async_close.return_value = None
-        client.async_get_status.return_value = DoorStatus(
+        client.connect.return_value = None
+        client.close.return_value = None
+        client.get_status.return_value = HubStatus(
             state=DoorState.CLOSED, position=0, rate=0
         )
         yield client
@@ -86,9 +88,9 @@ def mock_config_entry() -> MockConfigEntry:
             CONF_HUB_ID: TEST_CREDENTIALS.hub_id,
             CONF_PHONE_ID: TEST_CREDENTIALS.phone_id,
             CONF_PHONE_PASSWORD: TEST_CREDENTIALS.phone_password,
-            CONF_PHONE_SECRET: TEST_CREDENTIALS.phone_secret,
+            CONF_PHONE_SECRET: TEST_CREDENTIALS.control_secret,
             CONF_USER_PASSWORD: TEST_CREDENTIALS.user_password,
-            CONF_ACTION_DEVICE_ID: TEST_CREDENTIALS.action_device_id,
+            CONF_ACTION_DEVICE_ID: TEST_CREDENTIALS.device_id,
         },
         unique_id=TEST_HUB_ID,
     )

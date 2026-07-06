@@ -2,7 +2,11 @@
 
 from unittest.mock import AsyncMock
 
-from bnd_garage_api.exceptions import CannotConnect, InvalidAuth, MultipleDevicesFound
+from bnd_garage_client.errors import (
+    AmbiguousDeviceError,
+    AuthenticationError,
+    HubUnreachableError,
+)
 import pytest
 
 from homeassistant.config_entries import SOURCE_USER
@@ -49,7 +53,7 @@ async def test_form(
     assert result["title"] == "B&D Garage"
     assert result["data"][CONF_HOST] == TEST_HOST
     assert result["data"][CONF_HUB_ID] == TEST_CREDENTIALS.hub_id
-    assert result["data"][CONF_ACTION_DEVICE_ID] == TEST_CREDENTIALS.action_device_id
+    assert result["data"][CONF_ACTION_DEVICE_ID] == TEST_CREDENTIALS.device_id
     assert result["result"].unique_id == TEST_CREDENTIALS.hub_id
     assert len(mock_setup_entry.mock_calls) == 1
 
@@ -57,10 +61,10 @@ async def test_form(
 @pytest.mark.parametrize(
     ("side_effect", "expected_error"),
     [
-        pytest.param(InvalidAuth, "invalid_auth", id="invalid_auth"),
-        pytest.param(CannotConnect, "cannot_connect", id="cannot_connect"),
+        pytest.param(AuthenticationError, "invalid_auth", id="invalid_auth"),
+        pytest.param(HubUnreachableError, "cannot_connect", id="cannot_connect"),
         pytest.param(
-            MultipleDevicesFound([("door 1", "id1"), ("door 2", "id2")]),
+            AmbiguousDeviceError([("door 1", "id1"), ("door 2", "id2")]),
             "multiple_devices_found",
             id="multiple_devices_found",
         ),
@@ -163,8 +167,8 @@ async def test_reauth(
 @pytest.mark.parametrize(
     ("side_effect", "expected_error"),
     [
-        pytest.param(InvalidAuth, "invalid_auth", id="invalid_auth"),
-        pytest.param(CannotConnect, "cannot_connect", id="cannot_connect"),
+        pytest.param(AuthenticationError, "invalid_auth", id="invalid_auth"),
+        pytest.param(HubUnreachableError, "cannot_connect", id="cannot_connect"),
     ],
 )
 async def test_reauth_exceptions(

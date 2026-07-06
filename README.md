@@ -13,17 +13,17 @@ polling the hub locally over your LAN every 10 seconds.
 
 ## Current limitation: private dependency
 
-This integration depends on [bnd-garage-api](https://github.com/haids3/bnd-garage-api),
-which is **not yet public**. It's derived from
-[THE-MAVER1CK/b-and-d-garage-api](https://github.com/THE-MAVER1CK/b-and-d-garage-api)'s
-protocol reverse-engineering, and that upstream project has no LICENSE file —
-so `bnd-garage-api` stays private until that's resolved with its author.
+This integration depends on [bnd-garage-client](https://github.com/haids3/bnd-garage-client),
+an independent client for the B&D SmartDoorDevices LAN protocol (see that
+repo's README for full attribution to THE-MAVER1CK's original
+protocol-reverse-engineering research). It's currently private pending
+further review before wider distribution.
 
 Practically, this means:
 - Installing this integration only works for accounts with access to the
-  private `bnd-garage-api` repo (its git credentials need to be available to
-  wherever Home Assistant installs Python requirements).
-- It is **not usable via HACS by anyone else** until `bnd-garage-api` is
+  private `bnd-garage-client` repo (its git credentials need to be available
+  to wherever Home Assistant installs Python requirements).
+- It is **not usable via HACS by anyone else** until `bnd-garage-client` is
   published (PyPI or a public repo). Don't submit this to the default HACS
   store in the meantime.
 
@@ -53,18 +53,18 @@ directory and restart Home Assistant.
 
 ## Development
 
-Tests need `bnd-garage-api` installed, which is a private repo (see above).
-CI (`.github/workflows/test.yml`) needs a `BND_GARAGE_API_PAT` repository
-secret — a GitHub personal access token with read access to
-`haids3/bnd-garage-api` — to install it. Add this under
+Tests need `bnd-garage-client` installed, which is a private repo (see
+above). CI (`.github/workflows/test.yml`) needs a `BND_GARAGE_CLIENT_PAT`
+repository secret — a GitHub personal access token with read access to
+`haids3/bnd-garage-client` — to install it. Add this under
 **Settings → Secrets and variables → Actions** before the test workflow will
 pass.
 
 The "Hassfest validation" job in `.github/workflows/validate.yml` is expected
 to fail with `[REQUIREMENTS] ... contains a space` for the same reason: core's
 hassfest rejects the `name @ git+https://...` requirement syntax outright,
-with no way to opt out. This resolves itself once `bnd-garage-api` is public
-and `manifest.json` can go back to a normal PyPI version pin.
+with no way to opt out. This resolves itself once `bnd-garage-client` is
+public and `manifest.json` can go back to a normal PyPI version pin.
 
 ## Known limitations
 

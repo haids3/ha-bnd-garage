@@ -9,7 +9,7 @@
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/haids3/ha-bnd-garage/issues",
   "requirements": [
-    "bnd-garage-client @ git+https://github.com/haids3/bnd-garage-client.git@71231e6286ca881c44fca0ad11cfca6c4ba3525d"
+    "bnd-garage-client @ git+https://github.com/haids3/bnd-garage-client.git@fa5950a1523aab76ce338ab66a2a4cd54b01e20f"
   ],
   "version": "0.1.0"
 }

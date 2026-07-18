@@ -214,7 +214,10 @@ async def test_phone_lockout_error_surfaces_as_home_assistant_error(
 
     with pytest.raises(HomeAssistantError):
         await hass.services.async_call(
-            "switch", "turn_on", {ATTR_ENTITY_ID: PHONE_LOCKOUT_ENTITY_ID}, blocking=True
+            "switch",
+            "turn_on",
+            {ATTR_ENTITY_ID: PHONE_LOCKOUT_ENTITY_ID},
+            blocking=True,
         )
 
 

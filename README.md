@@ -2,8 +2,14 @@
 
 Control a B&D SmartDoorDevices garage door hub (Basestation) from Home Assistant.
 
-Exposes the garage door as a `cover` entity supporting open, close, and stop,
-polling the hub locally over your LAN every 10 seconds.
+Polls the hub locally over your LAN every 10 seconds and exposes:
+
+- A `cover` entity: open, close, stop, and set to an exact position.
+- A `light` entity, if the hub has one wired.
+- A `button` per position preset configured in the vendor app (e.g. "Pet", "Parcel").
+- A `switch` for the auxiliary relay output, if the hub has one wired.
+- `switch` entities for remote-control and phone lockout, if the hub reports them.
+- A diagnostic `sensor` showing the hub's own last-action log entry.
 
 ## Requirements
 
@@ -57,10 +63,20 @@ out. This resolves once `bnd-garage-client` is published to PyPI and
 
 ## Known limitations
 
-- Only open/close/stop are supported — the hub does not support commanding
-  the door to an arbitrary position.
+- Setting an exact door position only supports 5% increments (5-95%) - the
+  hub doesn't support arbitrary percentages. The door also settles roughly
+  ±1% off the requested value (a mechanical tolerance, not a bug) - e.g. a
+  target of 50% may settle at 49%.
+- **Phone lockout switch**: turning this on blocks *all* app-based control of
+  the door - including this integration - until it's turned back off. Status
+  reads keep working, and turning it back off is never itself blocked, so
+  there's no risk of a permanent lockout, but expect the cover and other
+  switches to stop responding to commands while it's on.
 - Only one hub per config entry; hubs with multiple doors are not yet supported.
 - Discovery (zeroconf/DHCP) is not implemented — the hub's IP must be entered manually.
+- Implemented in the underlying client library but not yet exposed as
+  entities here: hub info, device activity log history, WiFi diagnostics,
+  notification history, and advanced parameters (auto-close/light timers).
 
 ## Issues
 

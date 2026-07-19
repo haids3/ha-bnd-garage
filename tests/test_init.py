@@ -9,7 +9,7 @@ import pytest
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.const import CONF_HOST, Platform
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers import device_registry as dr, entity_registry as er
 import homeassistant.util.dt as dt_util
 
 from pytest_homeassistant_custom_component.common import (
@@ -179,12 +179,23 @@ async def test_migrates_single_device_entry_to_device_list(
     )
     old_entry.add_to_hass(hass)
 
+    device_registry = dr.async_get(hass)
+    old_device = device_registry.async_get_or_create(
+        config_entry_id=old_entry.entry_id,
+        identifiers={(DOMAIN, TEST_HUB_ID)},
+        name="B&D Garage",
+    )
+
     entity_registry = er.async_get(hass)
     cover_entry = entity_registry.async_get_or_create(
-        "cover", DOMAIN, TEST_HUB_ID, config_entry=old_entry
+        "cover", DOMAIN, TEST_HUB_ID, config_entry=old_entry, device_id=old_device.id
     )
     switch_entry = entity_registry.async_get_or_create(
-        "switch", DOMAIN, f"{TEST_HUB_ID}_auxiliary", config_entry=old_entry
+        "switch",
+        DOMAIN,
+        f"{TEST_HUB_ID}_auxiliary",
+        config_entry=old_entry,
+        device_id=old_device.id,
     )
 
     with patch("custom_components.bnd_garage._PLATFORMS", []):
@@ -202,6 +213,13 @@ async def test_migrates_single_device_entry_to_device_list(
     migrated_switch = entity_registry.async_get(switch_entry.entity_id)
     assert migrated_switch is not None
     assert migrated_switch.unique_id == f"{TEST_HUB_ID}_{TEST_DEVICE_ID}_auxiliary"
+
+    assert device_registry.async_get_device(identifiers={(DOMAIN, TEST_HUB_ID)}) is None
+    migrated_device = device_registry.async_get_device(
+        identifiers={(DOMAIN, f"{TEST_HUB_ID}_{TEST_DEVICE_ID}")}
+    )
+    assert migrated_device is not None
+    assert migrated_device.id == old_device.id
 
     assert await hass.config_entries.async_unload(old_entry.entry_id)
     await hass.async_block_till_done()

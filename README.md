@@ -2,6 +2,10 @@
 
 Control a B&D SmartDoorDevices garage door hub (Basestation) from Home Assistant.
 
+One pairing covers every device the hub reports - hubs with more than one
+door opener get a full set of entities per device, all under a single
+config entry.
+
 Polls the hub locally over your LAN every 10 seconds and exposes:
 
 - A `cover` entity: open, close, stop, and set to an exact position.
@@ -72,7 +76,6 @@ out. This resolves once `bnd-garage-client` is published to PyPI and
   reads keep working, and turning it back off is never itself blocked, so
   there's no risk of a permanent lockout, but expect the cover and other
   switches to stop responding to commands while it's on.
-- Only one hub per config entry; hubs with multiple doors are not yet supported.
 - Discovery (zeroconf/DHCP) is not implemented — the hub's IP must be entered manually.
 - Implemented in the underlying client library but not yet exposed as
   entities here: hub info, device activity log history, WiFi diagnostics,

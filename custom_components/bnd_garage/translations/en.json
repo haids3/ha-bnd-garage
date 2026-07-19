@@ -8,7 +8,6 @@
     "error": {
       "cannot_connect": "Failed to connect",
       "invalid_auth": "Invalid authentication",
-      "multiple_devices_found": "Found more than one device on this hub. This is not yet supported.",
       "unknown": "Unexpected error"
     },
     "step": {

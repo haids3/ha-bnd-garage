@@ -12,7 +12,7 @@ from homeassistant.const import CONF_HOST
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.bnd_garage.const import (
-    CONF_ACTION_DEVICE_ID,
+    CONF_DEVICE_IDS,
     CONF_HUB_ID,
     CONF_PHONE_ID,
     CONF_PHONE_PASSWORD,
@@ -24,13 +24,14 @@ pytest_plugins = "pytest_homeassistant_custom_component"
 
 TEST_HOST = "192.168.1.50"
 TEST_HUB_ID = "test-hub-id"
+TEST_DEVICE_ID = "test-device-id"
 TEST_CREDENTIALS = Credentials(
     hub_id=TEST_HUB_ID,
     phone_id="test-phone-id",
     phone_password="test-phone-password",
     control_secret="test-control-secret",
     user_password="test-user-password",
-    device_id="test-device-id",
+    devices=(TEST_DEVICE_ID,),
 )
 
 
@@ -90,7 +91,7 @@ def mock_config_entry() -> MockConfigEntry:
             CONF_PHONE_PASSWORD: TEST_CREDENTIALS.phone_password,
             CONF_PHONE_SECRET: TEST_CREDENTIALS.control_secret,
             CONF_USER_PASSWORD: TEST_CREDENTIALS.user_password,
-            CONF_ACTION_DEVICE_ID: TEST_CREDENTIALS.device_id,
+            CONF_DEVICE_IDS: list(TEST_CREDENTIALS.devices),
         },
         unique_id=TEST_HUB_ID,
     )

@@ -4,7 +4,9 @@ Control a B&D SmartDoorDevices garage door hub (Basestation) from Home Assistant
 
 One pairing covers every device the hub reports - hubs with more than one
 door opener get a full set of entities per device, all under a single
-config entry.
+config entry. The config entry is automatically named after the hub's own
+configured name, and checks every 30 minutes for a device added to the hub
+after setup, reloading itself to pick it up without needing to be re-added.
 
 Polls the hub locally over your LAN every 10 seconds and exposes:
 

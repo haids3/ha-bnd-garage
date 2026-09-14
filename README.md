@@ -17,6 +17,12 @@ Polls the hub locally over your LAN every 10 seconds and exposes:
 - `switch` entities for remote-control and phone lockout, if the hub reports them.
 - A diagnostic `sensor` showing the hub's own last-action log entry.
 
+## Acknowledgements
+
+This integration builds on the protocol reverse-engineering research of
+**THE-MAVER1CK**, whose work made talking to the B&D SmartDoorDevices hub
+possible in the first place. Published here with their permission.
+
 ## Requirements
 
 - A B&D SmartDoorDevices hub (Basestation) reachable on your local network.

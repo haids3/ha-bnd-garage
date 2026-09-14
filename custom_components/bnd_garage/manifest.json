@@ -4,7 +4,6 @@
   "codeowners": ["@haids3"],
   "config_flow": true,
   "dependencies": [],
-  "dhcp": [{ "macaddress": "AC64CF*" }],
   "documentation": "https://github.com/haids3/ha-bnd-garage",
   "integration_type": "hub",
   "iot_class": "local_polling",

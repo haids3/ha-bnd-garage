@@ -2,8 +2,6 @@
   "config": {
     "abort": {
       "already_configured": "Device is already configured",
-      "cannot_connect": "Failed to connect",
-      "not_paired": "This hub has not been paired with Home Assistant yet.",
       "reauth_successful": "Re-authentication was successful",
       "reconfigure_successful": "Reconfiguration was successful",
       "wrong_hub": "That is a different hub to the one already set up here."

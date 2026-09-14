@@ -64,6 +64,17 @@ def mock_register() -> Generator[AsyncMock]:
 
 
 @pytest.fixture
+def mock_read_hub_id() -> Generator[AsyncMock]:
+    """Mock the TLS-certificate hub ID read used by reconfigure and DHCP."""
+    with patch(
+        "custom_components.bnd_garage.config_flow.read_hub_id",
+        autospec=True,
+    ) as mock_read_hub_id:
+        mock_read_hub_id.return_value = TEST_HUB_ID
+        yield mock_read_hub_id
+
+
+@pytest.fixture
 def mock_client() -> Generator[AsyncMock]:
     """Mock the bnd_garage_client HubClient used during integration setup."""
     with patch(

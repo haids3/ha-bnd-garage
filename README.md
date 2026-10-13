@@ -92,3 +92,9 @@ out. This resolves once `bnd-garage-client` is published to PyPI and
 ## Issues
 
 Please report bugs and feature requests via [GitHub Issues](https://github.com/haids3/ha-bnd-garage/issues).
+
+## Disclaimer
+
+This is an unofficial integration, not affiliated with or endorsed by B&D
+Doors. B&D and the B&D logo are trademarks of their owner and are used only
+to identify the product this integration works with.
